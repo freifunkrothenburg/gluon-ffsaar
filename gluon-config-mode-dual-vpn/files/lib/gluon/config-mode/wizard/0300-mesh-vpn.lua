@@ -14,15 +14,22 @@ function M.section(form)
   local s = form:section(cbi.SimpleSection, nil, msg)
 
   local o
+  
+  fastd_enabled = uci:get_bool("fastd", "mesh_vpn", "enabled")
+  l2tp_enabled = uci:get_bool("tunneldigger", uci:get_first("tunneldigger", "broker"), "enabled")
 
   o = s:option(cbi.Flag, "_meshvpn", i18n.translate("Use internet connection (mesh VPN)"))
-  o.default = (uci:get_bool("fastd", "mesh_vpn", "enabled") or uci:get_bool("tunneldigger", uci:get_first("tunneldigger", "broker"), "enabled")) and o.enabled or o.disabled
+  o.default = (fastd_enabled or l2tp_enabled) and o.enabled or o.disabled
   o.rmempty = false
   
-  o = s:option(ListValue, "_whichvpn", i18n.translate("VPN protocol"))
+  o = s:option(cbi.ListValue, "_whichvpn", i18n.translate("VPN protocol"))
   o:depends("_meshvpn", "1")
   o.widget = "radio"
-  o.default = "fastd"
+  if l2tp_enabled then
+    o.default = "l2tp"
+  else
+    o.default = "fastd"
+  end
   o.rmempty = false
   o:value("fastd", i18n.translate('Use an encrypted tunnel (fastd) to connect to the VPN servers. ' ..
         'The encryption ensures that it is impossible for your internet access provider to see what ' ..
@@ -50,11 +57,13 @@ function M.section(form)
 end
 
 function M.handle(data)
-  uci:set("fastd", "mesh_vpn", "enabled", data._meshvpn and data.role == "fastd")
+  fastd_enabled = data._meshvpn == "1" and data._whichvpn == "fastd"
+  uci:set("fastd", "mesh_vpn", "enabled", fastd_enabled and "1" or "0")
   uci:save("fastd")
   uci:commit("fastd")
   
-  uci:set("tunneldigger", uci:get_first("tunneldigger", "broker"), "enabled", data._meshvpn and data.role == "l2tp")
+  l2tp_enabled = data._meshvpn == "1" and data._whichvpn == "l2tp"
+  uci:set("tunneldigger", uci:get_first("tunneldigger", "broker"), "enabled", l2tp_enabled and "1" or "0")
   uci:save("tunneldigger")
   uci:commit("tunneldigger")
 
