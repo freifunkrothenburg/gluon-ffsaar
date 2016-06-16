@@ -1,1 +1,1 @@
-*/3 * * * * /usr/bin/update-ra-filter
+*/1 * * * * /usr/bin/update-ra-filter
