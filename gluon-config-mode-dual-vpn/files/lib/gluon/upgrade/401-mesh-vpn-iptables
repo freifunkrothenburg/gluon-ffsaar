@@ -7,7 +7,9 @@ local util = require 'gluon.util'
 local uci = require('luci.model.uci').cursor()
 local lutil = require 'luci.util'
 
--- stuff that is done by both fastd and tunneldigger (in upgrade/400-*). make sure we know what happens.
+-- Stuff that is done by both fastd and tunneldigger (in upgrade/400-*). Make sure we know what happens.
+-- The simple-tc of the two does the same, so we don't mind. tunneldigger will probably tkae precedence
+-- because "t" follows "f" in the alphabet.
 uci:section('network', 'interface', 'mesh_vpn',
 	  {
 		  ifname = 'mesh-vpn',
@@ -15,6 +17,7 @@ uci:section('network', 'interface', 'mesh_vpn',
 		  mesh = 'bat0',
 		  mesh_no_rebroadcast = 1,
 		  mtu = site.tunneldigger_mesh_vpn.mtu,
+		  macaddr = util.generate_mac(4, 0),
 	  }
 )
 
