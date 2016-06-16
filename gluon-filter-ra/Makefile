@@ -11,6 +11,7 @@ define Package/gluon-filter-ra
   SECTION:=gluon
   CATEGORY:=Gluon
   TITLE:=Filters away router advertisments from all but the selected gateway
+  DEPENDS:=+gluon-core +gluon-ebtables
 endef
 
 define Package/gluon-filter-ra/description
