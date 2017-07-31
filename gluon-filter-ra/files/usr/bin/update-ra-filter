@@ -1,7 +1,7 @@
 #!/bin/sh
 # List the last bytes of the MAC addresses of all gateways
 # TODO: Do something more automatic and tied to site.conf?
-GWS="01 02 03 04"
+GWS="84 44 2d 9a 33"
 
 # Try to detect the selected gateway
 SEL_GW=$(batctl gwl | egrep "^=>" | tr -s ' ' | cut -d ' ' -f 2 | cut -d ':' -f 6)
